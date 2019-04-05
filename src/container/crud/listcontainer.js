@@ -1,63 +1,23 @@
 import React, {Component} from 'react';
 
-import Lista from './../../component/crud/listar';
-import {AsyncStorage,Alert } from 'react-native';
+import Lista from './../../component/lista';
+import firebase from 'react-native-firebase';
 
 class Listcontainer extends Component{
 
     constructor (props){
         super (props)
         this.state = {
-            agenda:[],
+            datos:[],
         };
     }
 
-    agregardDatos = async (Crud) =>{
-        try{
-                        
-            const crudEnEstring = JSON.stringify({
-                datosLista: crud,
-            });
-
-            const resultadoObtenerDatos = this.obtenerDatos();
-
-            if (resultadoObtenerDatos === null) {
-                await AsyncStorage.setItem('Crud', crudEnEstring);
-            }  
-            else{
-                await AsyncStorage.mergeItem ('Crud', crudEnEstring)
-            } 
-            await AsyncStorage.setItem('Crud', crudEnEstring);
-        }
-        catch(error){
-
-        }
-    }
-
-    obtenerDatos = async() =>{
-        try {
-            const crud = await AsyncStorage.getItem('crud')
-            if(crud=== null){
-                Alert.alert("yo soy un mensaje","no hay datos en la agenda");
-                return null;
-            }
-            else{
-                const arreglocrud = JSON.parse(crud);
-                return arreglocrud.datosLista;
-            }
-        }
-        catch (error){
-
-        }
-    }
-
     render (){
-        const {crud} = this.state;
-        console.log(crud);
+        const {datos} = this.state;
 
         return(
             <Lista
-                datosLista={crud}
+                datos={datos}
             />
         )
 
@@ -70,15 +30,59 @@ class Listcontainer extends Component{
        // console.log("Probando la base de datos",await this.obtenerDatos());
    // }
 
-    async componentDidMount(){
-        const datos = await this.obtenerDatos();
-        console.log("ObteniendoDatos", datos);
-        if (datos !== null){
-            this.setState({
-            crud: datos,
-             });
-        }
-    }
+    componentDidMount()
+    {
+       // const datos = await this.obtenerDatos();
+        //.log("ObteniendoDatos", datos);
+        //if (datos !== null){
+           // this.setState({
+           // crud: datos,
+            // });
+       // }
+       
+        const db =firebase.firestore();
+        db.collection('producto').onSnapshot((instantanea)=>{
+            const {datos} = this.state;
+            instantanea.docChanges.forEach((cambio)=>{
+                const indice = datos.findIndex(item => item.key === cambio.doc.id);
 
+                console.log("Datos: ", cambio.doc.data())
+
+                switch(cambio.type){
+                    case 'added':{
+                        datos.push({
+                            key: cambio.doc.id,
+                            title: cambio.doc.data().title,
+                            url: cambio.doc.data().url,
+
+                        });
+                        break
+                    }
+                    case 'modified':{
+                        if (indice !==-1){
+                            datos[indice].title = cambio.doc.data().title;
+                            datos[indice].url = cambio.doc.data().url;
+
+                        }
+                        break;
+                    }
+                    case 'removed':{
+                        if (indice !==-1){
+                            datos.splice(indice,1);
+                        }
+                        break;
+                    }
+                }
+            });
+            this.setState({
+                datos:datos,
+            });
+
+        });
+
+    }
+           
 }
+
+
 export  default Listcontainer;;
