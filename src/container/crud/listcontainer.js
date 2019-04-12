@@ -18,9 +18,14 @@ class Listcontainer extends Component{
         return(
             <Lista
                 datos={datos}
+                miEventoPressPantallaCrear={ this.miEventoPressPantallaCrear }
+                miEventoPressPantallaEditar={ this.miEventoPressPantallaEditar }
             />
         )
 
+    }
+    miEventoPressPantallaCrear = () => {
+        this.props.navigation.navigate('crear');
     }
     //Caso de prueba guardar datos
     //async componentDidMount(){
@@ -53,6 +58,7 @@ class Listcontainer extends Component{
                         datos.push({
                             key: cambio.doc.id,
                             title: cambio.doc.data().title,
+                            precio: cambio.doc.data().precio,
                             url: cambio.doc.data().url,
 
                         });
@@ -62,6 +68,7 @@ class Listcontainer extends Component{
                         if (indice !==-1){
                             datos[indice].title = cambio.doc.data().title;
                             datos[indice].url = cambio.doc.data().url;
+                            datos[indice].precio = cambio.doc.data().precio;
 
                         }
                         break;

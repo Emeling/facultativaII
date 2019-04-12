@@ -1,75 +1,72 @@
 import React, { Component } from 'react';
-import Crear from './../../component/crear';
+import Editar from './../../component/editar';
 import firebase from 'react-native-firebase'
 
-class CrearContainer extends Component {
+class EditarContainer extends Component {
 
     constructor(props) {
         super(props);
+
+        const photoParaActualizar = props.navigation.getParam('photoParaActualizar', {});
+
+        console.log('photoParaActualizar', photoParaActualizar);
+
         this.state = {
             //estado de nuestros datos
-            title: '',
-            url: '',
-            precio: '',
+            key: photoParaActualizar.key,
+            title: photoParaActualizar.title,
+            url: photoParaActualizar.url,
 
             //estado de nuestra interfaz
-            estadoEnGuardado: 'comienzo',
+            estadoEnEditado: 'comienzo',
         };
     }
 
     miEventoCambiarTitulo = (title) => {
         this.setState({
             title: title,
-            estadoEnGuardado: 'comienzo',
+            estadoEnEditado: 'comienzo',
         });
     }
 
     miEventoCambiarURL = (url) => {
         this.setState({
             url: url,
-            estadoEnGuardado: 'comienzo',
+            estadoEnEditado: 'comienzo',
         })
     }
 
-    miEventoCambiarPrecio = (precio) => {
-      this.setState({
-          precio: precio,
-          estadoEnGuardado: 'comienzo',
-      })
-  }
-
-    miEventoPressGuardar = () => {
+    miEventoPressEditar = () => {
 
         this.setState({
-            estadoEnGuardado: 'cargando',
+            estadoEnEditado: 'cargando',
         })
 
         const db = firebase.firestore();
 
         const {
+            key: photoId,
             title,
             url,
-            precio,
         } = this.state;
 
         db
-        .collection('producto')
-        .add({
+        .collection('photos')
+        .doc(photoId)
+        .update({
             title: title,
             url: url,
-            precio: precio,
         })
         .then(() => {
             this.setState({
                 title: '',
                 url: '',
-                precio: '',
-                estadoEnGuardado: 'guardado',
+                estadoEnEditado: 'guardado',
             })
         })
         .catch((error) => {
             this.setState({
-                estadoEnGuardado: 'error',
+                estadoEnEditado: 'error',
             })
         })
     }
@@ -79,20 +76,19 @@ class CrearContainer extends Component {
         const { 
             title,
             url,
-            precio,
-            estadoEnGuardado,
+            estadoEnEditado,
         } = this.state
 
+        console.log('title', title)
+
         return(
-            <Crear
+            <Editar
                 title={title}
                 miEventoCambiarTitulo={this.miEventoCambiarTitulo}
                 url={url}
                 miEventoCambiarURL={this.miEventoCambiarURL}
-                precio={precio}
-                miEventoCambiarPrecio={this.miEventoCambiarPrecio}
-                miEventoPressGuardar={this.miEventoPressGuardar}
-                estadoEnGuardado={estadoEnGuardado}
+                miEventoPressEditar={this.miEventoPressEditar}
+                estadoEnEditado={estadoEnEditado}
             />
         )
 
@@ -100,4 +96,4 @@ class CrearContainer extends Component {
 
 }
 
-export default CrearContainer;
+export default EditarContainer;

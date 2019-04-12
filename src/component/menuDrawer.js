@@ -1,4 +1,4 @@
-import react from 'react'
+
 
 import { 
     createDrawerNavigator,
@@ -9,9 +9,12 @@ import Inicio from './inicio'
 import RegistrarComponent from './registrarproducto'
 import CategoriaComponent from './categoria'
 import Lista from './../../src/container/crud/listcontainer'
+import stackNavigator from './../component/rutas'
 import Crear from './crud/crear'
+import Rutas from './rutas';
 
 const MenuDrawer = createDrawerNavigator({
+    
     Opcion1: {
         screen: Inicio,
         navigationOptions: {
@@ -19,20 +22,7 @@ const MenuDrawer = createDrawerNavigator({
         }
     },
     Opcion2: {
-        screen: CategoriaComponent,
-        navigationOptions: {
-            drawerLabel: 'Categorias',
-            //drawerIcon: <Image source={require('../../assets/categoria.png')} style={{resizeMode: 'cover', width: 24, height: 24,}}/>,
-        }
-    },
-    Opcion3: {
-        screen: RegistrarComponent,
-        navigationOptions: {
-            drawerLabel: 'Registrar Producto'
-        }
-    },
-    Opcion4: {
-        screen: Lista,
+        screen: Rutas,
         navigationOptions: {
             drawerLabel: 'Listar'
         }
